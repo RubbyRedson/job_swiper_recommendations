@@ -2,31 +2,41 @@ package se.openhack.jobsweeper.recommendation.controllers;
 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import se.openhack.jobsweeper.recommendation.entities.JobRecommendation;
-import se.openhack.jobsweeper.recommendation.entities.JobRecommendationResponse;
-import se.openhack.jobsweeper.recommendation.entities.Tag;
+import se.openhack.jobsweeper.recommendation.entities.*;
 
 @RestController
 public class MainController {
 
     @RequestMapping(path = "/get_job_recs",
             method = RequestMethod.GET)
-    public @ResponseBody JobRecommendationResponse getJobRecs(@RequestParam(value="userId") int id) {
+    public @ResponseBody JobRecommendationResponse getJobRecs(@RequestParam(value="userId") int id,
+                                                              @RequestParam(value="recNumber") int recNumber) {
         Tag java = new Tag("Java");
         Tag oop = new Tag("OOP");
         Tag cSharp = new Tag("C#");
         Tag programming = new Tag("Programming");
+        Tag network = new Tag("Network");
+        Tag recruitment = new Tag("Recruitment");
+        Tag hR = new Tag("Human Resource");
+        Tag agile = new Tag("Agile");
+        Tag docker = new Tag("Docker");
+        Tag security = new Tag("Security");
 
-        Tag[] firstTags = new Tag[2];
-        firstTags[0] = java;
-        firstTags[1] = oop;
-        JobRecommendation first = new JobRecommendation(1, firstTags);
+        Tag[] firstTags = new Tag[3];
+        int firstId = 6965402;
+        firstTags[0] = hR;
+        firstTags[1] = network;
+        firstTags[2] = recruitment;
+        JobRecommendation first = new JobRecommendation(firstId, firstTags);
 
 
-        Tag[] secTags = new Tag[2];
-        secTags[0] = cSharp;
-        secTags[1] = programming;
-        JobRecommendation second = new JobRecommendation(2, secTags);
+        Tag[] secTags = new Tag[4];
+        secTags[0] = java;
+        secTags[1] = agile;
+        secTags[2] = docker;
+        secTags[3] = security;
+        int secondId = 20662027;
+        JobRecommendation second = new JobRecommendation(secondId, secTags);
 
         JobRecommendation[] recs = new JobRecommendation[2];
         recs[0] = first;
@@ -35,10 +45,14 @@ public class MainController {
         return response;
     }
 
-//    @RequestMapping(path = {"/user/update"},
-//            method = RequestMethod.POST)
-//    public Object updateUser() {
-//        return "redirect:/metrics";
-//
-//    }
+    @RequestMapping(path = {"/update_user_recommendations"},
+            method = RequestMethod.POST)
+    public Object updateUser(@RequestBody UserPreferencesUpdateBody input) {
+        int userId = input.getUserId();
+        for (TagDelta tagDelta : input.getTagDelta()) {
+            //update tag for user with delta
+            System.out.println(userId + " tag " + tagDelta.getName() + " delta " + tagDelta.getDelta());
+        }
+        return "OK";
+    }
 }
