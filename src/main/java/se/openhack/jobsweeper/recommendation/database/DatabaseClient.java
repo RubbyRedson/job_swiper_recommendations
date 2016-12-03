@@ -188,7 +188,7 @@ public class DatabaseClient {
     public List<TagWithCounter> getTagsForUser(int userId) {
         try (Session session = driver.session()) {
             StatementResult result = session.run("MATCH (a:User {id:'" + userId + "'})-[b:interested]->(c:Tag) " +
-                    "return c.name as tag, b.counter as counter");
+                    "return c.name as tag, b.counter as counter ORDER BY counter DESC");
             List<TagWithCounter> tags = new ArrayList<>();
             while (result.hasNext()) {
                 Record tag = result.next();
