@@ -159,10 +159,10 @@ public class DatabaseClient {
 
        for (Tag tag : tags) {
            int tagId = 0;
-           StatementResult tagDb = session.run("MATCH (a:Tag { name:'"+tag.getName()+"'}) RETURN a");
+           StatementResult tagDb = session.run("MATCH (a:Tag { name:'"+tag.getName()+"'}) RETURN a.id as id");
            if (!tagDb.hasNext()) {
                tagId = session.run("MATCH (a:Tag) RETURN count(a) as count").next().get("count").asInt()+1;
-               session.run("CREATE (a:Tag {name:'Make-up', id:'"+ tagId+"'})");
+               session.run("CREATE (a:Tag {name:'" + tag.getName() + "', id:'"+ tagId+"'})");
            } else {
                tagId = Integer.parseInt(tagDb.next().get("id").asString());
            }
