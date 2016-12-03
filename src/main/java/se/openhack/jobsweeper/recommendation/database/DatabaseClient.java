@@ -117,6 +117,12 @@ public class DatabaseClient {
 
     }
 
+    public void createUser(int userId, String name) {
+        try (Session session = driver.session()) {
+            session.run("CREATE (a:User {name:'" + name +"', id:'"+userId+"'})");
+        }
+    }
+
     public void close() {
         driver.close();
     }

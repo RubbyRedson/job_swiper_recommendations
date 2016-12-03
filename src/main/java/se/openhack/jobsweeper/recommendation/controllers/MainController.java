@@ -30,8 +30,8 @@ public class MainController {
 
     @RequestMapping(path = {"/create_user"},
             method = RequestMethod.GET)
-    public Object createUser(@RequestParam(value="userId") int id) {
-        //create user
+    public Object createUser(@RequestParam(value="userId") int id, @RequestParam(value="name") String name) {
+        db.createUser(id, name);
         return "OK";
     }
 
