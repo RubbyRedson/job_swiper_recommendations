@@ -12,12 +12,18 @@ import java.util.List;
 
 public class DatabaseClient {
 
-    private Driver driver = GraphDatabase.driver("bolt://localhost", AuthTokens.basic("neo4j", "root"));
-//    private GraphDatabaseService graphDb;
-//    private final ObjectMapper objectMapper;
+    private Driver driver = GraphDatabase.driver("bolt://localhost", AuthTokens.basic("neo4j",
+            "root"));
 
 
     public DatabaseClient() {
+        try (Session session = driver.session()) {
+            if (!session.run("MATCH (a:Job { id:'6965402'}) RETURN a").hasNext())
+                initDatabase();
+        }
+    }
+
+    private void initDatabase() {
         try (Session session = driver.session()) {
             session.run("CREATE (a:Job {title:'HR', id:'6965402'})");
             session.run("CREATE (a:Job {title:'Java Developer', id:'20662027'})");
@@ -57,13 +63,10 @@ public class DatabaseClient {
             session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'8'})" + "CREATE (a)-[c:interested {counter:1}]->(b)");
             session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'9'})" + "CREATE (a)-[c:interested {counter:1}]->(b)");
         }
-
-
     }
 
     public JobRecommendationResponse recommendJobs(int userId, int recNumber) {
-        Session session = driver.session();
-        try {
+        try (Session session = driver.session()) {
             StatementResult result = session.run("MATCH (a:Job)-[b:has]->(c:Tag)<-[d:interested]-(e:User) WHERE e.id = '"
                     + userId + "' RETURN a.id AS id, c.name as tag");
 
@@ -93,8 +96,6 @@ public class DatabaseClient {
             }
             JobRecommendationResponse response = new JobRecommendationResponse(jobRecommendations);
             return response;
-        } finally {
-            session.close();
         }
     }
 
@@ -119,7 +120,7 @@ public class DatabaseClient {
 
     public void createUser(int userId, String name) {
         try (Session session = driver.session()) {
-            session.run("CREATE (a:User {name:'" + name +"', id:'"+userId+"'})");
+            session.run("CREATE (a:User {name:'" + name + "', id:'" + userId + "'})");
         }
     }
 
