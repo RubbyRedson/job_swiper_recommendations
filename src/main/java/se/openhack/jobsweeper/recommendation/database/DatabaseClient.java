@@ -98,7 +98,7 @@ public class DatabaseClient {
     public JobRecommendationResponse recommendJobs(int userId, int recNumber) {
         try (Session session = driver.session()) {
             StatementResult jobs = session.run("MATCH (a:Job)-[b:has]->(c:Tag)<-[d:interested]-(e:User) " +
-                    "WHERE e.id = '" + userId + "' RETURN a.id AS id, SUM(d.counter) as score ORDER BY score DESC\n" +
+                    "WHERE e.id = '" + userId + "' RETURN a.id AS id, SUM(d.counter) + ABS(MIN(d.counter)) as score ORDER BY score DESC\n" +
                     "LIMIT " + recNumber);
 
             List<JobRecommendation> jobRecommendations = new ArrayList<>();
