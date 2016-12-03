@@ -3,6 +3,7 @@ package se.openhack.jobsweeper.recommendation.database;
 import org.neo4j.driver.v1.*;
 import se.openhack.jobsweeper.recommendation.entities.*;
 import se.openhack.jobsweeper.recommendation.responses.JobRecommendationResponse;
+import se.openhack.jobsweeper.recommendation.responses.JobStats;
 import se.openhack.jobsweeper.recommendation.responses.OverallEmployerStats;
 
 import java.util.ArrayList;
@@ -174,7 +175,6 @@ public class DatabaseClient {
            }
            session.run("MATCH (a:Job { id:'"+id+"'}) " + " MATCH (b:Tag {id:'"+tagId+"'})" + "CREATE (a)-[c:has]->(b)");
        }
-
     }
 
     public void close() {
@@ -222,6 +222,24 @@ public class DatabaseClient {
                 employerStats.setDislikes(record.get("dislikes").asInt());
             }
             return employerStats;
+        }
+    }
+
+    public JobStats getJobStats(int id) {
+        String query = "MATCH (c:Job {id:'"+id+"'})<-[l:like]-(u:User) " +
+                "MATCH (c1:Job {id:'"+id+"'})<-[dl:dislike]-(u1:User) " +
+                "RETURN count(l) as likes, count(dl) as dislikes";
+
+        try (Session session = driver.session()) {
+            StatementResult result = session.run(query);
+            JobStats jobStats = new JobStats();
+            jobStats.setJobId(id);
+            while (result.hasNext()) {
+                Record record = result.next();
+                jobStats.setLikes(record.get("likes").asInt());
+                jobStats.setDislikes(record.get("dislikes").asInt());
+            }
+            return jobStats;
         }
     }
 }
