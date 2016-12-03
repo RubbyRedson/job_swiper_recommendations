@@ -1,10 +1,7 @@
 package se.openhack.jobsweeper.recommendation.database;
 
 import org.neo4j.driver.v1.*;
-import se.openhack.jobsweeper.recommendation.entities.Job;
-import se.openhack.jobsweeper.recommendation.entities.JobRecommendation;
-import se.openhack.jobsweeper.recommendation.entities.Tag;
-import se.openhack.jobsweeper.recommendation.entities.TagDelta;
+import se.openhack.jobsweeper.recommendation.entities.*;
 import se.openhack.jobsweeper.recommendation.responses.JobRecommendationResponse;
 
 import java.util.ArrayList;
@@ -173,5 +170,18 @@ public class DatabaseClient {
 
     public void close() {
         driver.close();
+    }
+
+    public List<TagWithCounter> getTagsForUser(int userId) {
+        try (Session session = driver.session()) {
+            StatementResult result = session.run("MATCH (a:User {id:'" + userId + "'})-[b:interested]->(c:Tag) " +
+                    "return c.name as tag, b.counter as counter");
+            List<TagWithCounter> tags = new ArrayList<>();
+            while (result.hasNext()) {
+                Record tag = result.next();
+                tags.add(new TagWithCounter(tag.get("tag").asString(), tag.get("counter").asInt()));
+            }
+            return tags;
+        }
     }
 }
