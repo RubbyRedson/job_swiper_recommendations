@@ -2,16 +2,16 @@ package se.openhack.jobsweeper.recommendation.database;
 
 import org.neo4j.driver.v1.*;
 import se.openhack.jobsweeper.recommendation.entities.JobRecommendation;
+import se.openhack.jobsweeper.recommendation.entities.Tag;
 import se.openhack.jobsweeper.recommendation.responses.JobRecommendationResponse;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-/**
- * Created by Nick on 12/3/2016.
- */
 public class DatabaseClient {
 
-    Driver driver = GraphDatabase.driver( "bolt://localhost", AuthTokens.basic( "neo4j", "root" ) );
+    private Driver driver = GraphDatabase.driver( "bolt://localhost", AuthTokens.basic( "neo4j", "root" ) );
 //    private GraphDatabaseService graphDb;
 //    private final ObjectMapper objectMapper;
 
@@ -57,21 +57,43 @@ public class DatabaseClient {
         session.run( "MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'9'})" + "CREATE (a)-[c:interested]->(b)" );
     }
 
-    public JobRecommendation recommendJobs(int userId, int recNumber) {
+    public JobRecommendationResponse recommendJobs(int userId, int recNumber) {
         Session session = driver.session();
 
         StatementResult result = session.run( "MATCH (a:Job)-[b:has]->(c:Tag)<-[d:interested]-(e:User) WHERE e.id = '"
                 + userId + "' RETURN a.id AS id, c.name as tag" );
 
 
-        while ( result.hasNext() )
+        HashMap<Integer, JobRecommendation> responseMap = new HashMap<>();
+        int counter = recNumber;
+        while ( result.hasNext() && counter > 0)
         {
             Record record = result.next();
-            System.out.println( record.get( "id" ).asString() + " " + record.get("name").asString() );
+            int jobId = Integer.parseInt(record.get( "id" ).asString());
+            if (responseMap.containsKey(jobId)) {
+                JobRecommendation jobRecommendation =
+                        responseMap.get(jobId);
+                jobRecommendation.getTags().add(new Tag(record.get("tag").asString()));
+                responseMap.put(jobId, jobRecommendation);
+            } else {
+                List<Tag> tags = new ArrayList<>();
+                tags.add(new Tag(record.get("tag").asString()));
+                responseMap.put(jobId, new JobRecommendation(jobId, tags));
+                counter--;
+            }
+            System.out.println( record.get( "id" ).asString() + " " + record.get("tag").asString() );
         }
 
+        List<JobRecommendation> jobRecommendations = new ArrayList<>();
+        for (JobRecommendation jobRecommendation : responseMap.values()) {
+            jobRecommendations.add(jobRecommendation);
+        }
+        JobRecommendationResponse response = new JobRecommendationResponse(jobRecommendations);
         session.close();
+        return response;
+    }
+
+    public void close() {
         driver.close();
-        return null;
     }
 }

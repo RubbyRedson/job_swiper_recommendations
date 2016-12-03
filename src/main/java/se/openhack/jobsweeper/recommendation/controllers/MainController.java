@@ -12,45 +12,45 @@ import java.util.List;
 @RestController
 public class MainController {
 
-    static DatabaseClient db = new DatabaseClient();
+    private DatabaseClient db = new DatabaseClient();
 
     @RequestMapping(path = "/get_job_recs",
             method = RequestMethod.GET)
     public @ResponseBody
     JobRecommendationResponse getJobRecs(@RequestParam(value="userId") int id,
                                          @RequestParam(value="recNumber") int recNumber) {
-        Tag java = new Tag("Java");
-        Tag oop = new Tag("OOP");
-        Tag cSharp = new Tag("C#");
-        Tag programming = new Tag("Programming");
-        Tag network = new Tag("Network");
-        Tag recruitment = new Tag("Recruitment");
-        Tag hR = new Tag("Human Resource");
-        Tag agile = new Tag("Agile");
-        Tag docker = new Tag("Docker");
-        Tag security = new Tag("Security");
-
-        List<Tag> firstTags = new ArrayList<>();
-        int firstId = 6965402;
-        firstTags.add(network);
-        firstTags.add(hR);
-        firstTags.add(recruitment);
-        JobRecommendation first = new JobRecommendation(firstId, firstTags);
-
-
-        List<Tag> secTags = new ArrayList<>();
-        secTags.add(java);
-        secTags.add(agile);
-        secTags.add(docker);
-        secTags.add(security);
-        int secondId = 20662027;
-        JobRecommendation second = new JobRecommendation(secondId, secTags);
-
-        List<JobRecommendation> recs =  new ArrayList<>();
-        recs.add(first);
-        recs.add(second);
-        JobRecommendationResponse response = new JobRecommendationResponse(recs);
-        return response;
+//        Tag java = new Tag("Java");
+//        Tag oop = new Tag("OOP");
+//        Tag cSharp = new Tag("C#");
+//        Tag programming = new Tag("Programming");
+//        Tag network = new Tag("Network");
+//        Tag recruitment = new Tag("Recruitment");
+//        Tag hR = new Tag("Human Resource");
+//        Tag agile = new Tag("Agile");
+//        Tag docker = new Tag("Docker");
+//        Tag security = new Tag("Security");
+//
+//        List<Tag> firstTags = new ArrayList<>();
+//        int firstId = 6965402;
+//        firstTags.add(network);
+//        firstTags.add(hR);
+//        firstTags.add(recruitment);
+//        JobRecommendation first = new JobRecommendation(firstId, firstTags);
+//
+//
+//        List<Tag> secTags = new ArrayList<>();
+//        secTags.add(java);
+//        secTags.add(agile);
+//        secTags.add(docker);
+//        secTags.add(security);
+//        int secondId = 20662027;
+//        JobRecommendation second = new JobRecommendation(secondId, secTags);
+//
+//        List<JobRecommendation> recs =  new ArrayList<>();
+//        recs.add(first);
+//        recs.add(second);
+//        JobRecommendationResponse response = new JobRecommendationResponse(recs);
+        return db.recommendJobs(id, recNumber);
     }
 
     @RequestMapping(path = {"/update_user_recommendations"},
