@@ -1,4 +1,6 @@
-package se.openhack.jobsweeper.recommendation.entities;
+package se.openhack.jobsweeper.recommendation.requests;
+
+import se.openhack.jobsweeper.recommendation.entities.TagDelta;
 
 /**
  * Created by Nick on 12/2/2016.

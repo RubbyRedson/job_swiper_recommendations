@@ -1,16 +1,18 @@
 package se.openhack.jobsweeper.recommendation.controllers;
 
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import se.openhack.jobsweeper.recommendation.entities.*;
+import se.openhack.jobsweeper.recommendation.requests.UserPreferencesUpdateBody;
+import se.openhack.jobsweeper.recommendation.responses.JobRecommendationResponse;
 
 @RestController
 public class MainController {
 
     @RequestMapping(path = "/get_job_recs",
             method = RequestMethod.GET)
-    public @ResponseBody JobRecommendationResponse getJobRecs(@RequestParam(value="userId") int id,
-                                                              @RequestParam(value="recNumber") int recNumber) {
+    public @ResponseBody
+    JobRecommendationResponse getJobRecs(@RequestParam(value="userId") int id,
+                                         @RequestParam(value="recNumber") int recNumber) {
         Tag java = new Tag("Java");
         Tag oop = new Tag("OOP");
         Tag cSharp = new Tag("C#");
@@ -53,6 +55,13 @@ public class MainController {
             //update tag for user with delta
             System.out.println(userId + " tag " + tagDelta.getName() + " delta " + tagDelta.getDelta());
         }
+        return "OK";
+    }
+
+    @RequestMapping(path = {"/create_user"},
+            method = RequestMethod.GET)
+    public Object createUser(@RequestParam(value="userId") int id) {
+        //create user
         return "OK";
     }
 }

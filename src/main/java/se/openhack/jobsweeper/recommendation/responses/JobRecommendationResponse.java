@@ -1,4 +1,6 @@
-package se.openhack.jobsweeper.recommendation.entities;
+package se.openhack.jobsweeper.recommendation.responses;
+
+import se.openhack.jobsweeper.recommendation.entities.JobRecommendation;
 
 /**
  * Created by Nick on 12/2/2016.
