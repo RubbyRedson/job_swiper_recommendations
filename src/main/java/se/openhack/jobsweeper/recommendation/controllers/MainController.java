@@ -2,12 +2,10 @@ package se.openhack.jobsweeper.recommendation.controllers;
 
 import org.springframework.web.bind.annotation.*;
 import se.openhack.jobsweeper.recommendation.database.DatabaseClient;
-import se.openhack.jobsweeper.recommendation.entities.*;
 import se.openhack.jobsweeper.recommendation.requests.UserPreferencesUpdateBody;
 import se.openhack.jobsweeper.recommendation.responses.JobRecommendationResponse;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.annotation.PreDestroy;
 
 @RestController
 public class MainController {
@@ -19,37 +17,6 @@ public class MainController {
     public @ResponseBody
     JobRecommendationResponse getJobRecs(@RequestParam(value="userId") int id,
                                          @RequestParam(value="recNumber") int recNumber) {
-//        Tag java = new Tag("Java");
-//        Tag oop = new Tag("OOP");
-//        Tag cSharp = new Tag("C#");
-//        Tag programming = new Tag("Programming");
-//        Tag network = new Tag("Network");
-//        Tag recruitment = new Tag("Recruitment");
-//        Tag hR = new Tag("Human Resource");
-//        Tag agile = new Tag("Agile");
-//        Tag docker = new Tag("Docker");
-//        Tag security = new Tag("Security");
-//
-//        List<Tag> firstTags = new ArrayList<>();
-//        int firstId = 6965402;
-//        firstTags.add(network);
-//        firstTags.add(hR);
-//        firstTags.add(recruitment);
-//        JobRecommendation first = new JobRecommendation(firstId, firstTags);
-//
-//
-//        List<Tag> secTags = new ArrayList<>();
-//        secTags.add(java);
-//        secTags.add(agile);
-//        secTags.add(docker);
-//        secTags.add(security);
-//        int secondId = 20662027;
-//        JobRecommendation second = new JobRecommendation(secondId, secTags);
-//
-//        List<JobRecommendation> recs =  new ArrayList<>();
-//        recs.add(first);
-//        recs.add(second);
-//        JobRecommendationResponse response = new JobRecommendationResponse(recs);
         return db.recommendJobs(id, recNumber);
     }
 
@@ -57,10 +24,7 @@ public class MainController {
             method = RequestMethod.POST)
     public Object updateUser(@RequestBody UserPreferencesUpdateBody input) {
         int userId = input.getUserId();
-        for (TagDelta tagDelta : input.getTagDelta()) {
-            //update tag for user with delta
-            System.out.println(userId + " tag " + tagDelta.getName() + " delta " + tagDelta.getDelta());
-        }
+        db.updateTags(userId, input.getTagDeltas());
         return "OK";
     }
 
@@ -69,5 +33,10 @@ public class MainController {
     public Object createUser(@RequestParam(value="userId") int id) {
         //create user
         return "OK";
+    }
+
+    @PreDestroy
+    public void cleanup() {
+        db.close();
     }
 }

@@ -27,7 +27,7 @@ public class UserPreferencesUpdateBody {
         this.userId = userId;
     }
 
-    public List<TagDelta>  getTagDelta() {
+    public List<TagDelta> getTagDeltas() {
         return tagDelta;
     }
 
