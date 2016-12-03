@@ -111,9 +111,13 @@ public class DatabaseClient {
 
     public JobRecommendationResponse recommendJobs(int userId, int recNumber) {
         try (Session session = driver.session()) {
-            StatementResult jobs = session.run("MATCH (a:Job)-[b:has]->(c:Tag)<-[d:interested]-(e:User) " +
-                    "WHERE e.id = '" + userId + "' RETURN a.id AS id, SUM(d.counter) + ABS(MIN(d.counter)) as score ORDER BY score DESC\n" +
-                    "LIMIT " + recNumber);
+            String query = "MATCH (a:Job)-[b:has]->(c:Tag)<-[d:interested]-(e:User) WHERE e.id = '"+userId+"' \n" +
+                    "\t\t\tOPTIONAL MATCH (a)<-[sw:swiped]-(e)\n" +
+                    "\t\t\tWITH a,d\n" +
+                    "\t\t\tWHERE sw IS NULL \n" +
+                    "\t\t\tRETURN a.id AS id, SUM(d.counter) + ABS(MIN(d.counter)) as score ORDER BY score DESC "+
+                    "LIMIT " + recNumber;
+            StatementResult jobs = session.run(query);
 
             List<JobRecommendation> jobRecommendations = new ArrayList<>();
             while (jobs.hasNext()) {
