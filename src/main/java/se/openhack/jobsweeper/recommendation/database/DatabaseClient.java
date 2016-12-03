@@ -3,6 +3,7 @@ package se.openhack.jobsweeper.recommendation.database;
 import org.neo4j.driver.v1.*;
 import se.openhack.jobsweeper.recommendation.entities.*;
 import se.openhack.jobsweeper.recommendation.responses.JobRecommendationResponse;
+import se.openhack.jobsweeper.recommendation.responses.OverallEmployerStats;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +33,9 @@ public class DatabaseClient {
 
             session.run("CREATE (a:User {name:'John', id:'1'})");
             session.run("CREATE (a:User {name:'Mike', id:'2'})");
+
+            session.run("CREATE (a:Employer {name:'Oogle', id:'1'})");
+            session.run("CREATE (a:Employer {name:'Beauty SPA', id:'2'})");
 
 
             session.run("CREATE (a:Tag {name:'Java', id:'1'})");
@@ -73,6 +77,11 @@ public class DatabaseClient {
             session.run("MATCH (a:Job { id:'20662027'}) " + " MATCH (b:Tag {id:'8'})" + "CREATE (a)-[c:has]->(b)");
             session.run("MATCH (a:Job { id:'20662027'}) " + " MATCH (b:Tag {id:'9'})" + "CREATE (a)-[c:has]->(b)");
 
+
+            session.run("MATCH (a:Job { id:'20662027'}) " + " MATCH (b:Employer {id:'1'})" + "CREATE (a)-[c:postedBy]->(b)");
+            session.run("MATCH (a:Job { id:'20673861'}) " + " MATCH (b:Employer {id:'1'})" + "CREATE (a)-[c:postedBy]->(b)");
+            session.run("MATCH (a:Job { id:'20674929'}) " + " MATCH (b:Employer {id:'2'})" + "CREATE (a)-[c:postedBy]->(b)");
+            session.run("MATCH (a:Job { id:'6965402'}) " + " MATCH (b:Employer {id:'2'})" + "CREATE (a)-[c:postedBy]->(b)");
 
             session.run("MATCH (a:User { id:'1'})  MATCH (b:Tag {id:'6'}) CREATE (a)-[c:interested {counter:1}]->(b)");
             session.run("MATCH (a:User { id:'1'})  MATCH (b:Tag {id:'5'}) CREATE (a)-[c:interested {counter:1}]->(b)");
@@ -155,7 +164,7 @@ public class DatabaseClient {
         session.run("CREATE (a:Job {id:'"+id+"', title:'"+title+"'})");
 
        for (Tag tag : tags) {
-           int tagId = 0;
+           int tagId;
            StatementResult tagDb = session.run("MATCH (a:Tag { name:'"+tag.getName()+"'}) RETURN a.id as id");
            if (!tagDb.hasNext()) {
                tagId = session.run("MATCH (a:Tag) RETURN count(a) as count").next().get("count").asInt()+1;
@@ -196,6 +205,23 @@ public class DatabaseClient {
 
             }
             session.run(query);
+        }
+    }
+
+    public OverallEmployerStats getOverallEmployerStats(int id) {
+        String query = "MATCH (e:Employer {id:'"+id+"'})<-[b:postedBy]-(c:Job)<-[l:like]-(u:User) " +
+                "MATCH (e1:Employer {id:'"+id+"'})<-[b1:postedBy]-(c1:Job)<-[dl:dislike]-(u1:User) " +
+                "RETURN count(l) as likes, count(dl) as dislikes";
+        try (Session session = driver.session()) {
+            StatementResult result = session.run(query);
+            OverallEmployerStats employerStats = new OverallEmployerStats();
+            employerStats.setEmployerId(id);
+            while (result.hasNext()) {
+                Record record = result.next();
+                employerStats.setLikes(record.get("likes").asInt());
+                employerStats.setDislikes(record.get("dislikes").asInt());
+            }
+            return employerStats;
         }
     }
 }

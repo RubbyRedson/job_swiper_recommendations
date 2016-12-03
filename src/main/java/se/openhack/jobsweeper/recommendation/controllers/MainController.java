@@ -7,6 +7,7 @@ import se.openhack.jobsweeper.recommendation.entities.TagWithCounter;
 import se.openhack.jobsweeper.recommendation.requests.JobSwipeBodyRequest;
 import se.openhack.jobsweeper.recommendation.requests.UserPreferencesUpdateBody;
 import se.openhack.jobsweeper.recommendation.responses.JobRecommendationResponse;
+import se.openhack.jobsweeper.recommendation.responses.OverallEmployerStats;
 
 import javax.annotation.PreDestroy;
 import java.util.List;
@@ -59,6 +60,13 @@ public class MainController {
         db.jobSwipe(input.getUserId(), input.getJobId(), input.isLike());
         return "OK";
     }
+
+    @RequestMapping(path = {"/overall_stats_employer"},
+            method = RequestMethod.GET)
+    public OverallEmployerStats getOverallEmployerStats(@RequestParam(value="employerId") int id) {
+        return db.getOverallEmployerStats(id);
+    }
+
 
     @PreDestroy
     public void cleanup() {
