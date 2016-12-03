@@ -2,14 +2,16 @@ package se.openhack.jobsweeper.recommendation.requests;
 
 import se.openhack.jobsweeper.recommendation.entities.TagDelta;
 
+import java.util.List;
+
 /**
  * Created by Nick on 12/2/2016.
  */
 public class UserPreferencesUpdateBody {
     private int userId;
-    private TagDelta tagDelta[];
+    private List<TagDelta> tagDelta;
 
-    public UserPreferencesUpdateBody(int userId, TagDelta[] tagDelta) {
+    public UserPreferencesUpdateBody(int userId, List<TagDelta>  tagDelta) {
         this.userId = userId;
         this.tagDelta = tagDelta;
     }
@@ -25,11 +27,11 @@ public class UserPreferencesUpdateBody {
         this.userId = userId;
     }
 
-    public TagDelta[] getTagDelta() {
+    public List<TagDelta>  getTagDelta() {
         return tagDelta;
     }
 
-    public void setTagDelta(TagDelta[] tagDelta) {
+    public void setTagDelta(List<TagDelta> tagDelta) {
         this.tagDelta = tagDelta;
     }
 }

@@ -1,12 +1,18 @@
 package se.openhack.jobsweeper.recommendation.controllers;
 
 import org.springframework.web.bind.annotation.*;
+import se.openhack.jobsweeper.recommendation.database.DatabaseClient;
 import se.openhack.jobsweeper.recommendation.entities.*;
 import se.openhack.jobsweeper.recommendation.requests.UserPreferencesUpdateBody;
 import se.openhack.jobsweeper.recommendation.responses.JobRecommendationResponse;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 public class MainController {
+
+    static DatabaseClient db = new DatabaseClient();
 
     @RequestMapping(path = "/get_job_recs",
             method = RequestMethod.GET)
@@ -24,25 +30,25 @@ public class MainController {
         Tag docker = new Tag("Docker");
         Tag security = new Tag("Security");
 
-        Tag[] firstTags = new Tag[3];
+        List<Tag> firstTags = new ArrayList<>();
         int firstId = 6965402;
-        firstTags[0] = hR;
-        firstTags[1] = network;
-        firstTags[2] = recruitment;
+        firstTags.add(network);
+        firstTags.add(hR);
+        firstTags.add(recruitment);
         JobRecommendation first = new JobRecommendation(firstId, firstTags);
 
 
-        Tag[] secTags = new Tag[4];
-        secTags[0] = java;
-        secTags[1] = agile;
-        secTags[2] = docker;
-        secTags[3] = security;
+        List<Tag> secTags = new ArrayList<>();
+        secTags.add(java);
+        secTags.add(agile);
+        secTags.add(docker);
+        secTags.add(security);
         int secondId = 20662027;
         JobRecommendation second = new JobRecommendation(secondId, secTags);
 
-        JobRecommendation[] recs = new JobRecommendation[2];
-        recs[0] = first;
-        recs[1] = second;
+        List<JobRecommendation> recs =  new ArrayList<>();
+        recs.add(first);
+        recs.add(second);
         JobRecommendationResponse response = new JobRecommendationResponse(recs);
         return response;
     }

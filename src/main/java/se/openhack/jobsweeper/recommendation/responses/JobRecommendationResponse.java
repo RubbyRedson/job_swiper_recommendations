@@ -2,24 +2,26 @@ package se.openhack.jobsweeper.recommendation.responses;
 
 import se.openhack.jobsweeper.recommendation.entities.JobRecommendation;
 
+import java.util.List;
+
 /**
  * Created by Nick on 12/2/2016.
  */
 public class JobRecommendationResponse {
-    private JobRecommendation[] recommendations;
+    private List<JobRecommendation> recommendations;
 
-    public JobRecommendationResponse(JobRecommendation[] recommendations) {
+    public JobRecommendationResponse(List<JobRecommendation> recommendations) {
         this.recommendations = recommendations;
     }
 
     public JobRecommendationResponse() {
     }
 
-    public JobRecommendation[] getRecommendations() {
+    public List<JobRecommendation> getRecommendations() {
         return recommendations;
     }
 
-    public void setRecommendations(JobRecommendation[] recommendations) {
+    public void setRecommendations(List<JobRecommendation> recommendations) {
         this.recommendations = recommendations;
     }
 }

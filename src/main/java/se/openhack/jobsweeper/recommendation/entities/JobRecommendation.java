@@ -1,13 +1,15 @@
 package se.openhack.jobsweeper.recommendation.entities;
 
+import java.util.List;
+
 /**
  * Created by Nick on 12/2/2016.
  */
 public class JobRecommendation {
     private int id;
-    private Tag[] tags;
+    private List<Tag> tags;
 
-    public JobRecommendation(int id, Tag[] tags) {
+    public JobRecommendation(int id, List<Tag> tags) {
         this.id = id;
         this.tags = tags;
     }
@@ -23,11 +25,11 @@ public class JobRecommendation {
         this.id = id;
     }
 
-    public Tag[] getTags() {
+    public List<Tag> getTags() {
         return tags;
     }
 
-    public void setTags(Tag[] tags) {
+    public void setTags( List<Tag>tags) {
         this.tags = tags;
     }
 }
