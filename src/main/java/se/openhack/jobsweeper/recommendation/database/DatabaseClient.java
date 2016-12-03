@@ -117,7 +117,11 @@ public class DatabaseClient {
                     "\t\t\tWHERE sw IS NULL \n" +
                     "\t\t\tRETURN a.id AS id, SUM(d.counter) + ABS(MIN(d.counter)) as score ORDER BY score DESC " +
                     "LIMIT " + recNumber;
-            StatementResult jobs = session.run(query);
+
+            String query_no_check_for_previous_swipes = "MATCH (a:Job)-[b:has]->(c:Tag)<-[d:interested]-(e:User) " +
+                    "WHERE e.id = '" + userId + "' RETURN a.id AS id, SUM(d.counter) + ABS(MIN(d.counter)) as score ORDER BY score DESC\n" +
+                    "LIMIT " + recNumber;
+            StatementResult jobs = session.run(query_no_check_for_previous_swipes);
 
             List<JobRecommendation> jobRecommendations = new ArrayList<>();
             while (jobs.hasNext()) {
