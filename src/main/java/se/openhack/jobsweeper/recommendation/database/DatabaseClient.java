@@ -111,11 +111,11 @@ public class DatabaseClient {
 
     public JobRecommendationResponse recommendJobs(int userId, int recNumber) {
         try (Session session = driver.session()) {
-            String query = "MATCH (a:Job)-[b:has]->(c:Tag)<-[d:interested]-(e:User) WHERE e.id = '"+userId+"' \n" +
+            String query = "MATCH (a:Job)-[b:has]->(c:Tag)<-[d:interested]-(e:User) WHERE e.id = '" + userId + "' \n" +
                     "\t\t\tOPTIONAL MATCH (a)<-[sw:swiped]-(e)\n" +
                     "\t\t\tWITH a,d\n" +
                     "\t\t\tWHERE sw IS NULL \n" +
-                    "\t\t\tRETURN a.id AS id, SUM(d.counter) + ABS(MIN(d.counter)) as score ORDER BY score DESC "+
+                    "\t\t\tRETURN a.id AS id, SUM(d.counter) + ABS(MIN(d.counter)) as score ORDER BY score DESC " +
                     "LIMIT " + recNumber;
             StatementResult jobs = session.run(query);
 
@@ -170,19 +170,19 @@ public class DatabaseClient {
     }
 
     private void insertJob(int id, String title, List<Tag> tags, Session session) {
-        session.run("MERGE (a:Job {id:'"+id+"', title:'"+title+"'})");
+        session.run("MERGE (a:Job {id:'" + id + "', title:'" + title + "'})");
 
-       for (Tag tag : tags) {
-           int tagId;
-           StatementResult tagDb = session.run("MATCH (a:Tag { name:'"+tag.getName()+"'}) RETURN a.id as id");
-           if (!tagDb.hasNext()) {
-               tagId = session.run("MATCH (a:Tag) RETURN count(a) as count").next().get("count").asInt()+1;
-               session.run("MERGE (a:Tag {name:'" + tag.getName() + "', id:'"+ tagId+"'})");
-           } else {
-               tagId = Integer.parseInt(tagDb.next().get("id").asString());
-           }
-           session.run("MATCH (a:Job { id:'"+id+"'}) " + " MATCH (b:Tag {id:'"+tagId+"'})" + "MERGE (a)-[c:has]->(b)");
-       }
+        for (Tag tag : tags) {
+            int tagId;
+            StatementResult tagDb = session.run("MATCH (a:Tag { name:'" + tag.getName() + "'}) RETURN a.id as id");
+            if (!tagDb.hasNext()) {
+                tagId = session.run("MATCH (a:Tag) RETURN count(a) as count").next().get("count").asInt() + 1;
+                session.run("MERGE (a:Tag {name:'" + tag.getName() + "', id:'" + tagId + "'})");
+            } else {
+                tagId = Integer.parseInt(tagDb.next().get("id").asString());
+            }
+            session.run("MATCH (a:Job { id:'" + id + "'}) " + " MATCH (b:Tag {id:'" + tagId + "'})" + "MERGE (a)-[c:has]->(b)");
+        }
     }
 
     public void close() {
@@ -205,11 +205,11 @@ public class DatabaseClient {
     public void jobSwipe(int userId, int jobId, boolean like) {
         try (Session session = driver.session()) {
             String query = "MATCH (a:User {id:'" + userId + "'}) " +
-                    "MATCH (b:Job {id:'"+jobId+"'}) ";
+                    "MATCH (b:Job {id:'" + jobId + "'}) ";
             if (like) {
-                query += "MERGE (a)-[c:swiped]->(b) SET c.like = true";
+                query += "MERGE (a)-[c:swiped {like:true}]->(b)";
             } else {
-                query += "MERGE (a)-[c:swiped]->(b) SET c.like = false";
+                query += "MERGE (a)-[c:swiped {like:false}]->(b)";
 
             }
             session.run(query);
@@ -217,8 +217,8 @@ public class DatabaseClient {
     }
 
     public OverallEmployerStats getOverallEmployerStats(int id) {
-        String query = "MATCH (e:Employer {id:'"+id+"'})<-[b:postedBy]-(c:Job)<-[l:swiped {like:true}]-(u:User) " +
-                "MATCH (e1:Employer {id:'"+id+"'})<-[b1:postedBy]-(c1:Job)<-[dl:swiped {like:false}]-(u1:User) " +
+        String query = "MATCH (e:Employer {id:'" + id + "'})<-[b:postedBy]-(c:Job)<-[l:swiped {like:true}]-(u:User) " +
+                "MATCH (e1:Employer {id:'" + id + "'})<-[b1:postedBy]-(c1:Job)<-[dl:swiped {like:false}]-(u1:User) " +
                 "RETURN count(l) as likes, count(dl) as dislikes";
         try (Session session = driver.session()) {
             StatementResult result = session.run(query);
@@ -234,8 +234,8 @@ public class DatabaseClient {
     }
 
     public List<JobStats> getJobStats(int employer) {
-        String query = "MATCH (e:Employer {id:'"+employer+"'})<-[b:postedBy]-(c:Job)<-[l:swiped {like:true}]-(u:User) " +
-                "MATCH (e1:Employer {id:'"+employer+"'})<-[b1:postedBy]-(c1:Job)<-[dl:swiped {like:false}]-(u1:User) " +
+        String query = "MATCH (e:Employer {id:'" + employer + "'})<-[b:postedBy]-(c:Job)<-[l:swiped {like:true}]-(u:User) " +
+                "MATCH (e1:Employer {id:'" + employer + "'})<-[b1:postedBy]-(c1:Job)<-[dl:swiped {like:false}]-(u1:User) " +
                 "RETURN c.id as jobId, count(l) as likes, count(dl) as dislikes";
 
         try (Session session = driver.session()) {
@@ -285,5 +285,36 @@ public class DatabaseClient {
             }
             return resultList;
         }
+    }
+
+    public List<Integer> getPositiveSwipes(int id) {
+        String query = "MATCH (c1:Job)<-[dl:swiped {like:true}]-(u1:User {id:'" + id + "'}) " +
+                "RETURN c1.id as jobId";
+
+        try (Session session = driver.session()) {
+            StatementResult result = session.run(query);
+            List<Integer> resultList = new ArrayList<>();
+            while (result.hasNext()) {
+                Record record = result.next();
+                resultList.add(Integer.parseInt(record.get("jobId").asString()));
+            }
+            return resultList;
+        }
+    }
+
+    public List<Integer> getNegativeSwipes(int id) {
+        String query = "MATCH (c1:Job)<-[dl:swiped {like:false}]-(u1:User {id:'" + id + "'}) " +
+                "RETURN c1.id as jobId";
+
+        try (Session session = driver.session()) {
+            StatementResult result = session.run(query);
+            List<Integer> resultList = new ArrayList<>();
+            while (result.hasNext()) {
+                Record record = result.next();
+                resultList.add(Integer.parseInt(record.get("jobId").asString()));
+            }
+            return resultList;
+        }
+
     }
 }

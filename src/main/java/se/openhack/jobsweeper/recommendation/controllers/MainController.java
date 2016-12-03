@@ -81,6 +81,18 @@ public class MainController {
         return db.getJobApplicants(id);
     }
 
+    @RequestMapping(path = {"/positive_swiped_jobs"},
+            method = RequestMethod.GET)
+    public List<Integer> getPositiveSwiped(@RequestParam(value="userId") int id) {
+        return db.getPositiveSwipes(id);
+    }
+
+    @RequestMapping(path = {"/negative_swiped_jobs"},
+            method = RequestMethod.GET)
+    public List<Integer> getNegativeSwiped(@RequestParam(value="userId") int id) {
+        return db.getNegativeSwipes(id);
+    }
+
     @PreDestroy
     public void cleanup() {
         db.close();
