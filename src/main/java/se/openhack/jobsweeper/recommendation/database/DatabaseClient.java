@@ -99,34 +99,22 @@ public class DatabaseClient {
 
     public JobRecommendationResponse recommendJobs(int userId, int recNumber) {
         try (Session session = driver.session()) {
-            StatementResult result = session.run("MATCH (a:Job)-[b:has]->(c:Tag)<-[d:interested]-(e:User) WHERE e.id = '"
-                    + userId + "' RETURN a.id AS id, c.name as tag");
-
-
-            HashMap<Integer, JobRecommendation> responseMap = new HashMap<>();
-            int counter = recNumber;
-            while (result.hasNext()) {
-                Record record = result.next();
-                int jobId = Integer.parseInt(record.get("id").asString());
-                if (responseMap.containsKey(jobId)) {
-                    JobRecommendation jobRecommendation =
-                            responseMap.get(jobId);
-                    jobRecommendation.getTags().add(new Tag(record.get("tag").asString()));
-                    responseMap.put(jobId, jobRecommendation);
-                } else {
-                    if (counter > 0) {
-                        List<Tag> tags = new ArrayList<>();
-                        tags.add(new Tag(record.get("tag").asString()));
-                        responseMap.put(jobId, new JobRecommendation(jobId, tags));
-                        counter--;
-                    }
-                }
-                System.out.println(record.get("id").asString() + " " + record.get("tag").asString());
-            }
+            StatementResult jobs = session.run("MATCH (a:Job)-[b:has]->(c:Tag)<-[d:interested]-(e:User) " +
+                    "WHERE e.id = '" + userId + "' RETURN a.id AS id, SUM(d.counter) as score ORDER BY score DESC\n" +
+                    "LIMIT " + recNumber);
 
             List<JobRecommendation> jobRecommendations = new ArrayList<>();
-            for (JobRecommendation jobRecommendation : responseMap.values()) {
-                jobRecommendations.add(jobRecommendation);
+            while (jobs.hasNext()) {
+                Record record = jobs.next();
+                int jobId = Integer.parseInt(record.get("id").asString());
+                StatementResult result = session.run("MATCH (a:Job {id:'" + jobId + "'})-[b:has]->(c:Tag) " +
+                        "return c.name as tag");
+                List<Tag> tags = new ArrayList<>();
+                while (result.hasNext()) {
+                    Record jobTag = result.next();
+                    tags.add(new Tag(jobTag.get("tag").asString()));
+                }
+                jobRecommendations.add(new JobRecommendation(jobId, tags));
             }
             return new JobRecommendationResponse(jobRecommendations);
         }
