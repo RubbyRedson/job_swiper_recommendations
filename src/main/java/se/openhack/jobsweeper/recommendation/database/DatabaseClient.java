@@ -2,6 +2,7 @@ package se.openhack.jobsweeper.recommendation.database;
 
 import org.neo4j.driver.v1.*;
 import se.openhack.jobsweeper.recommendation.entities.*;
+import se.openhack.jobsweeper.recommendation.responses.JobApplicants;
 import se.openhack.jobsweeper.recommendation.responses.JobRecommendationResponse;
 import se.openhack.jobsweeper.recommendation.responses.JobStats;
 import se.openhack.jobsweeper.recommendation.responses.OverallEmployerStats;
@@ -25,83 +26,86 @@ public class DatabaseClient {
 
     private void initDatabase() {
         try (Session session = driver.session()) {
-            session.run("CREATE (a:Job {title:'HR', id:'6965402'})");
-            session.run("CREATE (a:Job {title:'Java Developer', id:'20662027'})");
-            session.run("CREATE (a:Job {title:'Java Tester Unix', id:'20674382'})");
-            session.run("CREATE (a:Job {title:'Web Developer', id:'20673861'})");
-            session.run("CREATE (a:Job {title:'Beauty Saloon Staff', id:'20674929'})");
+            session.run("MERGE (a:Job {title:'HR', id:'6965402'})");
+            session.run("MERGE (a:Job {title:'Java Developer', id:'20662027'})");
+            session.run("MERGE (a:Job {title:'Java Tester Unix', id:'20674382'})");
+            session.run("MERGE (a:Job {title:'Web Developer', id:'20673861'})");
+            session.run("MERGE (a:Job {title:'Beauty Saloon Staff', id:'20674929'})");
 
 
-            session.run("CREATE (a:User {name:'John', id:'1'})");
-            session.run("CREATE (a:User {name:'Mike', id:'2'})");
+            session.run("MERGE (a:User {name:'John', id:'1'})");
+            session.run("MERGE (a:User {name:'Mike', id:'2'})");
 
-            session.run("CREATE (a:Employer {name:'Oogle', id:'1'})");
-            session.run("CREATE (a:Employer {name:'Beauty SPA', id:'2'})");
-
-
-            session.run("CREATE (a:Tag {name:'Java', id:'1'})");
-            session.run("CREATE (a:Tag {name:'OOP', id:'2'})");
-            session.run("CREATE (a:Tag {name:'C#', id:'3'})");
-            session.run("CREATE (a:Tag {name:'Programming', id:'4'})");
-            session.run("CREATE (a:Tag {name:'Network', id:'5'})");
-            session.run("CREATE (a:Tag {name:'Recruitment', id:'6'})");
-            session.run("CREATE (a:Tag {name:'Human Resource', id:'7'})");
-            session.run("CREATE (a:Tag {name:'Agile', id:'8'})");
-            session.run("CREATE (a:Tag {name:'Docker', id:'9'})");
-            session.run("CREATE (a:Tag {name:'Security', id:'10'})");
-            session.run("CREATE (a:Tag {name:'Linux', id:'11'})");
-            session.run("CREATE (a:Tag {name:'Testing', id:'12'})");
-            session.run("CREATE (a:Tag {name:'Web', id:'13'})");
-            session.run("CREATE (a:Tag {name:'HTML5', id:'14'})");
-            session.run("CREATE (a:Tag {name:'Javascript', id:'15'})");
-            session.run("CREATE (a:Tag {name:'Beauty', id:'16'})");
-            session.run("CREATE (a:Tag {name:'Make-up', id:'17'})");
+            session.run("MERGE (a:Employer {name:'Oogle', id:'1'})");
+            session.run("MERGE (a:Employer {name:'Beauty SPA', id:'2'})");
 
 
-            session.run("MATCH (a:Job { id:'6965402'}) " + " MATCH (b:Tag {id:'6'})" + "CREATE (a)-[c:has]->(b)");
-            session.run("MATCH (a:Job { id:'6965402'}) " + " MATCH (b:Tag {id:'7'})" + "CREATE (a)-[c:has]->(b)");
-            session.run("MATCH (a:Job { id:'6965402'}) " + " MATCH (b:Tag {id:'5'})" + "CREATE (a)-[c:has]->(b)");
-
-            session.run("MATCH (a:Job { id:'20674382'}) " + " MATCH (b:Tag {id:'1'})" + "CREATE (a)-[c:has]->(b)");
-            session.run("MATCH (a:Job { id:'20674382'}) " + " MATCH (b:Tag {id:'11'})" + "CREATE (a)-[c:has]->(b)");
-            session.run("MATCH (a:Job { id:'20674382'}) " + " MATCH (b:Tag {id:'12'})" + "CREATE (a)-[c:has]->(b)");
-
-            session.run("MATCH (a:Job { id:'20673861'}) " + " MATCH (b:Tag {id:'13'})" + "CREATE (a)-[c:has]->(b)");
-            session.run("MATCH (a:Job { id:'20673861'}) " + " MATCH (b:Tag {id:'14'})" + "CREATE (a)-[c:has]->(b)");
-            session.run("MATCH (a:Job { id:'20673861'}) " + " MATCH (b:Tag {id:'15'})" + "CREATE (a)-[c:has]->(b)");
-
-            session.run("MATCH (a:Job { id:'20674929'}) " + " MATCH (b:Tag {id:'16'})" + "CREATE (a)-[c:has]->(b)");
-            session.run("MATCH (a:Job { id:'20674929'}) " + " MATCH (b:Tag {id:'17'})" + "CREATE (a)-[c:has]->(b)");
-
-            session.run("MATCH (a:Job { id:'20662027'}) " + " MATCH (b:Tag {id:'1'})" + "CREATE (a)-[c:has]->(b)");
-            session.run("MATCH (a:Job { id:'20662027'}) " + " MATCH (b:Tag {id:'10'})" + "CREATE (a)-[c:has]->(b)");
-            session.run("MATCH (a:Job { id:'20662027'}) " + " MATCH (b:Tag {id:'8'})" + "CREATE (a)-[c:has]->(b)");
-            session.run("MATCH (a:Job { id:'20662027'}) " + " MATCH (b:Tag {id:'9'})" + "CREATE (a)-[c:has]->(b)");
+            session.run("MERGE (a:Tag {name:'Java', id:'1'})");
+            session.run("MERGE (a:Tag {name:'OOP', id:'2'})");
+            session.run("MERGE (a:Tag {name:'C#', id:'3'})");
+            session.run("MERGE (a:Tag {name:'Programming', id:'4'})");
+            session.run("MERGE (a:Tag {name:'Network', id:'5'})");
+            session.run("MERGE (a:Tag {name:'Recruitment', id:'6'})");
+            session.run("MERGE (a:Tag {name:'Human Resource', id:'7'})");
+            session.run("MERGE (a:Tag {name:'Agile', id:'8'})");
+            session.run("MERGE (a:Tag {name:'Docker', id:'9'})");
+            session.run("MERGE (a:Tag {name:'Security', id:'10'})");
+            session.run("MERGE (a:Tag {name:'Linux', id:'11'})");
+            session.run("MERGE (a:Tag {name:'Testing', id:'12'})");
+            session.run("MERGE (a:Tag {name:'Web', id:'13'})");
+            session.run("MERGE (a:Tag {name:'HTML5', id:'14'})");
+            session.run("MERGE (a:Tag {name:'Javascript', id:'15'})");
+            session.run("MERGE (a:Tag {name:'Beauty', id:'16'})");
+            session.run("MERGE (a:Tag {name:'Make-up', id:'17'})");
 
 
-            session.run("MATCH (a:Job { id:'20662027'}) " + " MATCH (b:Employer {id:'1'})" + "CREATE (a)-[c:postedBy]->(b)");
-            session.run("MATCH (a:Job { id:'20673861'}) " + " MATCH (b:Employer {id:'1'})" + "CREATE (a)-[c:postedBy]->(b)");
-            session.run("MATCH (a:Job { id:'20674929'}) " + " MATCH (b:Employer {id:'2'})" + "CREATE (a)-[c:postedBy]->(b)");
-            session.run("MATCH (a:Job { id:'6965402'}) " + " MATCH (b:Employer {id:'2'})" + "CREATE (a)-[c:postedBy]->(b)");
+            session.run("MATCH (a:Job { id:'6965402'}) " + " MATCH (b:Tag {id:'6'})" + "MERGE (a)-[c:has]->(b)");
+            session.run("MATCH (a:Job { id:'6965402'}) " + " MATCH (b:Tag {id:'7'})" + "MERGE (a)-[c:has]->(b)");
+            session.run("MATCH (a:Job { id:'6965402'}) " + " MATCH (b:Tag {id:'5'})" + "MERGE (a)-[c:has]->(b)");
 
-            session.run("MATCH (a:User { id:'1'})  MATCH (b:Tag {id:'6'}) CREATE (a)-[c:interested {counter:1}]->(b)");
-            session.run("MATCH (a:User { id:'1'})  MATCH (b:Tag {id:'5'}) CREATE (a)-[c:interested {counter:1}]->(b)");
-            session.run("MATCH (a:User { id:'1'})  MATCH (b:Tag {id:'7'}) CREATE (a)-[c:interested {counter:1}]->(b)");
+            session.run("MATCH (a:Job { id:'20674382'}) " + " MATCH (b:Tag {id:'1'})" + "MERGE (a)-[c:has]->(b)");
+            session.run("MATCH (a:Job { id:'20674382'}) " + " MATCH (b:Tag {id:'11'})" + "MERGE (a)-[c:has]->(b)");
+            session.run("MATCH (a:Job { id:'20674382'}) " + " MATCH (b:Tag {id:'12'})" + "MERGE (a)-[c:has]->(b)");
 
-            session.run("MATCH (a:User { id:'1'})  MATCH (b:Tag {id:'16'}) CREATE (a)-[c:interested {counter:1}]->(b)");
-            session.run("MATCH (a:User { id:'1'})  MATCH (b:Tag {id:'15'}) CREATE (a)-[c:interested {counter:1}]->(b)");
+            session.run("MATCH (a:Job { id:'20673861'}) " + " MATCH (b:Tag {id:'13'})" + "MERGE (a)-[c:has]->(b)");
+            session.run("MATCH (a:Job { id:'20673861'}) " + " MATCH (b:Tag {id:'14'})" + "MERGE (a)-[c:has]->(b)");
+            session.run("MATCH (a:Job { id:'20673861'}) " + " MATCH (b:Tag {id:'15'})" + "MERGE (a)-[c:has]->(b)");
 
-            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'1'})" + "CREATE (a)-[c:interested {counter:1}]->(b)");
-            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'10'})" + "CREATE (a)-[c:interested {counter:1}]->(b)");
-            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'8'})" + "CREATE (a)-[c:interested {counter:1}]->(b)");
-            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'9'})" + "CREATE (a)-[c:interested {counter:1}]->(b)");
+            session.run("MATCH (a:Job { id:'20674929'}) " + " MATCH (b:Tag {id:'16'})" + "MERGE (a)-[c:has]->(b)");
+            session.run("MATCH (a:Job { id:'20674929'}) " + " MATCH (b:Tag {id:'17'})" + "MERGE (a)-[c:has]->(b)");
 
-            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'11'})" + "CREATE (a)-[c:interested {counter:1}]->(b)");
-            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'12'})" + "CREATE (a)-[c:interested {counter:1}]->(b)");
+            session.run("MATCH (a:Job { id:'20662027'}) " + " MATCH (b:Tag {id:'1'})" + "MERGE (a)-[c:has]->(b)");
+            session.run("MATCH (a:Job { id:'20662027'}) " + " MATCH (b:Tag {id:'10'})" + "MERGE (a)-[c:has]->(b)");
+            session.run("MATCH (a:Job { id:'20662027'}) " + " MATCH (b:Tag {id:'8'})" + "MERGE (a)-[c:has]->(b)");
+            session.run("MATCH (a:Job { id:'20662027'}) " + " MATCH (b:Tag {id:'9'})" + "MERGE (a)-[c:has]->(b)");
 
-            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'13'})" + "CREATE (a)-[c:interested {counter:1}]->(b)");
-            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'14'})" + "CREATE (a)-[c:interested {counter:1}]->(b)");
-            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'15'})" + "CREATE (a)-[c:interested {counter:1}]->(b)");
+
+            session.run("MATCH (a:Job { id:'20662027'}) " + " MATCH (b:Employer {id:'1'})" + "MERGE (a)-[c:postedBy]->(b)");
+            session.run("MATCH (a:Job { id:'20673861'}) " + " MATCH (b:Employer {id:'1'})" + "MERGE (a)-[c:postedBy]->(b)");
+            session.run("MATCH (a:Job { id:'20674929'}) " + " MATCH (b:Employer {id:'2'})" + "MERGE (a)-[c:postedBy]->(b)");
+            session.run("MATCH (a:Job { id:'6965402'}) " + " MATCH (b:Employer {id:'2'})" + "MERGE (a)-[c:postedBy]->(b)");
+
+            session.run("MATCH (a:User { id:'1'})  MATCH (b:Tag {id:'6'}) MERGE (a)-[c:interested {counter:1}]->(b)");
+            session.run("MATCH (a:User { id:'1'})  MATCH (b:Tag {id:'5'}) MERGE (a)-[c:interested {counter:1}]->(b)");
+            session.run("MATCH (a:User { id:'1'})  MATCH (b:Tag {id:'7'}) MERGE (a)-[c:interested {counter:1}]->(b)");
+
+            session.run("MATCH (a:User { id:'1'})  MATCH (b:Tag {id:'16'}) MERGE (a)-[c:interested {counter:1}]->(b)");
+            session.run("MATCH (a:User { id:'1'})  MATCH (b:Tag {id:'15'}) MERGE (a)-[c:interested {counter:1}]->(b)");
+
+            session.run("MATCH (a:User { id:'2'})  MATCH (b:Job {id:'20662027'}) MERGE (a)-[c:swiped {like:true}]->(b)");
+            session.run("MATCH (a:User { id:'2'})  MATCH (b:Job {id:'6965402'}) MERGE (a)-[c:swiped {like:false}]->(b)");
+
+            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'1'})" + "MERGE (a)-[c:interested {counter:1}]->(b)");
+            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'10'})" + "MERGE (a)-[c:interested {counter:1}]->(b)");
+            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'8'})" + "MERGE (a)-[c:interested {counter:1}]->(b)");
+            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'9'})" + "MERGE (a)-[c:interested {counter:1}]->(b)");
+
+            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'11'})" + "MERGE (a)-[c:interested {counter:1}]->(b)");
+            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'12'})" + "MERGE (a)-[c:interested {counter:1}]->(b)");
+
+            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'13'})" + "MERGE (a)-[c:interested {counter:1}]->(b)");
+            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'14'})" + "MERGE (a)-[c:interested {counter:1}]->(b)");
+            session.run("MATCH (a:User { id:'2'}) " + " MATCH (b:Tag {id:'15'})" + "MERGE (a)-[c:interested {counter:1}]->(b)");
         }
     }
 
@@ -149,7 +153,7 @@ public class DatabaseClient {
 
     public void createUser(int userId, String name) {
         try (Session session = driver.session()) {
-            session.run("CREATE (a:User {name:'" + name + "', id:'" + userId + "'})");
+            session.run("MERGE (a:User {name:'" + name + "', id:'" + userId + "'})");
         }
     }
 
@@ -162,18 +166,18 @@ public class DatabaseClient {
     }
 
     private void insertJob(int id, String title, List<Tag> tags, Session session) {
-        session.run("CREATE (a:Job {id:'"+id+"', title:'"+title+"'})");
+        session.run("MERGE (a:Job {id:'"+id+"', title:'"+title+"'})");
 
        for (Tag tag : tags) {
            int tagId;
            StatementResult tagDb = session.run("MATCH (a:Tag { name:'"+tag.getName()+"'}) RETURN a.id as id");
            if (!tagDb.hasNext()) {
                tagId = session.run("MATCH (a:Tag) RETURN count(a) as count").next().get("count").asInt()+1;
-               session.run("CREATE (a:Tag {name:'" + tag.getName() + "', id:'"+ tagId+"'})");
+               session.run("MERGE (a:Tag {name:'" + tag.getName() + "', id:'"+ tagId+"'})");
            } else {
                tagId = Integer.parseInt(tagDb.next().get("id").asString());
            }
-           session.run("MATCH (a:Job { id:'"+id+"'}) " + " MATCH (b:Tag {id:'"+tagId+"'})" + "CREATE (a)-[c:has]->(b)");
+           session.run("MATCH (a:Job { id:'"+id+"'}) " + " MATCH (b:Tag {id:'"+tagId+"'})" + "MERGE (a)-[c:has]->(b)");
        }
     }
 
@@ -199,9 +203,9 @@ public class DatabaseClient {
             String query = "MATCH (a:User {id:'" + userId + "'}) " +
                     "MATCH (b:Job {id:'"+jobId+"'}) ";
             if (like) {
-                query += "CREATE (a)-[c:like]->(b)";
+                query += "MERGE (a)-[c:swiped]->(b) SET c.like = true";
             } else {
-                query += "CREATE (a)-[c:dislike]->(b)";
+                query += "MERGE (a)-[c:swiped]->(b) SET c.like = false";
 
             }
             session.run(query);
@@ -209,8 +213,8 @@ public class DatabaseClient {
     }
 
     public OverallEmployerStats getOverallEmployerStats(int id) {
-        String query = "MATCH (e:Employer {id:'"+id+"'})<-[b:postedBy]-(c:Job)<-[l:like]-(u:User) " +
-                "MATCH (e1:Employer {id:'"+id+"'})<-[b1:postedBy]-(c1:Job)<-[dl:dislike]-(u1:User) " +
+        String query = "MATCH (e:Employer {id:'"+id+"'})<-[b:postedBy]-(c:Job)<-[l:swiped {like:true}]-(u:User) " +
+                "MATCH (e1:Employer {id:'"+id+"'})<-[b1:postedBy]-(c1:Job)<-[dl:swiped {like:false}]-(u1:User) " +
                 "RETURN count(l) as likes, count(dl) as dislikes";
         try (Session session = driver.session()) {
             StatementResult result = session.run(query);
@@ -225,21 +229,57 @@ public class DatabaseClient {
         }
     }
 
-    public JobStats getJobStats(int id) {
-        String query = "MATCH (c:Job {id:'"+id+"'})<-[l:like]-(u:User) " +
-                "MATCH (c1:Job {id:'"+id+"'})<-[dl:dislike]-(u1:User) " +
-                "RETURN count(l) as likes, count(dl) as dislikes";
+    public List<JobStats> getJobStats(int employer) {
+        String query = "MATCH (e:Employer {id:'"+employer+"'})<-[b:postedBy]-(c:Job)<-[l:swiped {like:true}]-(u:User) " +
+                "MATCH (e1:Employer {id:'"+employer+"'})<-[b1:postedBy]-(c1:Job)<-[dl:swiped {like:false}]-(u1:User) " +
+                "RETURN c.id as jobId, count(l) as likes, count(dl) as dislikes";
 
         try (Session session = driver.session()) {
             StatementResult result = session.run(query);
-            JobStats jobStats = new JobStats();
-            jobStats.setJobId(id);
+            List<JobStats> jobStats = new ArrayList<>();
             while (result.hasNext()) {
+                JobStats jobStat = new JobStats();
                 Record record = result.next();
-                jobStats.setLikes(record.get("likes").asInt());
-                jobStats.setDislikes(record.get("dislikes").asInt());
+                jobStat.setJobId(Integer.parseInt(record.get("jobId").asString()));
+                jobStat.setLikes(record.get("likes").asInt());
+                jobStat.setDislikes(record.get("dislikes").asInt());
+                jobStats.add(jobStat);
             }
             return jobStats;
+        }
+    }
+
+    public List<JobApplicants> getJobApplicants(int id) {
+        String query = "MATCH (e:Employer {id:'" + id + "'})<-[b:postedBy]-(c:Job)<-[l:swiped {like:true}]-(u:User) " +
+                "RETURN c.id as jobId, u.id as userId";
+
+        HashMap<Integer, JobApplicants> resultMap = new HashMap<>();
+        try (Session session = driver.session()) {
+            StatementResult result = session.run(query);
+            while (result.hasNext()) {
+                Record record = result.next();
+                int jobId = Integer.parseInt(record.get("jobId").asString());
+                if (resultMap.containsKey(jobId)) {
+                    JobApplicants jobApplicants = resultMap.get(jobId);
+                    List<Integer> userIds = jobApplicants.getUserIds();
+                    userIds.add(Integer.parseInt(record.get("userId").asString()));
+                    jobApplicants.setUserIds(userIds);
+                    resultMap.put(jobId, jobApplicants);
+                } else {
+                    List<Integer> userIds = new ArrayList<>();
+                    userIds.add(Integer.parseInt(record.get("userId").asString()));
+
+                    JobApplicants jobApplicants = new JobApplicants(jobId, userIds);
+                    jobApplicants.setUserIds(userIds);
+                    resultMap.put(jobId, jobApplicants);
+                }
+            }
+
+            List<JobApplicants> resultList = new ArrayList<>();
+            for (JobApplicants jobApplicants : resultMap.values()) {
+                resultList.add(jobApplicants);
+            }
+            return resultList;
         }
     }
 }
