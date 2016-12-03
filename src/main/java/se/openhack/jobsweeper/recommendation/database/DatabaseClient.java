@@ -1,6 +1,7 @@
 package se.openhack.jobsweeper.recommendation.database;
 
 import org.neo4j.driver.v1.*;
+import se.openhack.jobsweeper.recommendation.entities.Job;
 import se.openhack.jobsweeper.recommendation.entities.JobRecommendation;
 import se.openhack.jobsweeper.recommendation.entities.Tag;
 import se.openhack.jobsweeper.recommendation.entities.TagDelta;
@@ -143,6 +144,31 @@ public class DatabaseClient {
         try (Session session = driver.session()) {
             session.run("CREATE (a:User {name:'" + name + "', id:'" + userId + "'})");
         }
+    }
+
+    public void insertNewJobs(List<Job> jobs) {
+        try (Session session = driver.session()) {
+            for (Job job : jobs) {
+                insertJob(job.getId(), job.getTitle(), job.getTags(), session);
+            }
+        }
+    }
+
+    private void insertJob(int id, String title, List<Tag> tags, Session session) {
+        session.run("CREATE (a:Job {id:'"+id+"', title:'"+title+"'})");
+
+       for (Tag tag : tags) {
+           int tagId = 0;
+           StatementResult tagDb = session.run("MATCH (a:Tag { name:'"+tag.getName()+"'}) RETURN a");
+           if (!tagDb.hasNext()) {
+               tagId = session.run("MATCH (a:Tag) RETURN count(a) as count").next().get("count").asInt()+1;
+               session.run("CREATE (a:Tag {name:'Make-up', id:'"+ tagId+"'})");
+           } else {
+               tagId = Integer.parseInt(tagDb.next().get("id").asString());
+           }
+           session.run("MATCH (a:Job { id:'"+id+"'}) " + " MATCH (b:Tag {id:'"+tagId+"'})" + "CREATE (a)-[c:has]->(b)");
+       }
+
     }
 
     public void close() {

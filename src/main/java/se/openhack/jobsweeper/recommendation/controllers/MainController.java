@@ -2,10 +2,12 @@ package se.openhack.jobsweeper.recommendation.controllers;
 
 import org.springframework.web.bind.annotation.*;
 import se.openhack.jobsweeper.recommendation.database.DatabaseClient;
+import se.openhack.jobsweeper.recommendation.entities.Job;
 import se.openhack.jobsweeper.recommendation.requests.UserPreferencesUpdateBody;
 import se.openhack.jobsweeper.recommendation.responses.JobRecommendationResponse;
 
 import javax.annotation.PreDestroy;
+import java.util.List;
 
 @RestController
 public class MainController {
@@ -32,6 +34,13 @@ public class MainController {
             method = RequestMethod.GET)
     public Object createUser(@RequestParam(value="userId") int id, @RequestParam(value="name") String name) {
         db.createUser(id, name);
+        return "OK";
+    }
+
+    @RequestMapping(path = {"/insert_new_jobs"},
+            method = RequestMethod.POST)
+    public Object insertNewJobs(@RequestBody List<Job> input) {
+        db.insertNewJobs(input);
         return "OK";
     }
 
