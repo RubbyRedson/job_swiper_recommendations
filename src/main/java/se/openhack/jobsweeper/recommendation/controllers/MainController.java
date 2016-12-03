@@ -3,8 +3,8 @@ package se.openhack.jobsweeper.recommendation.controllers;
 import org.springframework.web.bind.annotation.*;
 import se.openhack.jobsweeper.recommendation.database.DatabaseClient;
 import se.openhack.jobsweeper.recommendation.entities.Job;
-import se.openhack.jobsweeper.recommendation.entities.TagDelta;
 import se.openhack.jobsweeper.recommendation.entities.TagWithCounter;
+import se.openhack.jobsweeper.recommendation.requests.JobSwipeBodyRequest;
 import se.openhack.jobsweeper.recommendation.requests.UserPreferencesUpdateBody;
 import se.openhack.jobsweeper.recommendation.responses.JobRecommendationResponse;
 
@@ -51,6 +51,13 @@ public class MainController {
     public @ResponseBody
     List<TagWithCounter> getTagsForUser(@RequestParam(value="userId") int id) {
         return db.getTagsForUser(id);
+    }
+
+    @RequestMapping(path = {"/job_swipe"},
+            method = RequestMethod.POST)
+    public Object jobSwipe(@RequestBody JobSwipeBodyRequest input) {
+        db.jobSwipe(input.getUserId(), input.getJobId(), input.isLike());
+        return "OK";
     }
 
     @PreDestroy

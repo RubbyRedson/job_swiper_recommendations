@@ -184,4 +184,18 @@ public class DatabaseClient {
             return tags;
         }
     }
+
+    public void jobSwipe(int userId, int jobId, boolean like) {
+        try (Session session = driver.session()) {
+            String query = "MATCH (a:User {id:'" + userId + "'}) " +
+                    "MATCH (b:Job {id:'"+jobId+"'}) ";
+            if (like) {
+                query += "CREATE (a)-[c:like]->(b)";
+            } else {
+                query += "CREATE (a)-[c:dislike]->(b)";
+
+            }
+            session.run(query);
+        }
+    }
 }
