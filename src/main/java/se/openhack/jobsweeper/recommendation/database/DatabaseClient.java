@@ -18,10 +18,12 @@ public class DatabaseClient {
 
 
     public DatabaseClient() {
+        /*
         try (Session session = driver.session()) {
             if (!session.run("MATCH (a:Job { id:'6965402'}) RETURN a").hasNext())
-                initDatabase();
+                //initDatabase();
         }
+        */
     }
 
     private void initDatabase() {
@@ -200,6 +202,9 @@ public class DatabaseClient {
             List<TagWithCounter> tags = new ArrayList<>();
             while (result.hasNext()) {
                 Record tag = result.next();
+
+
+                int i = tag.get("counter").asInt();
                 tags.add(new TagWithCounter(tag.get("tag").asString(), tag.get("counter").asInt()));
             }
             return tags;
