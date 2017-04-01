@@ -174,11 +174,19 @@ public class DatabaseClient {
     private void updateTag(int userId, String tagName, int delta, Session session) {
         StatementResult result = session.run("MATCH (c:Tag {name:'" + tagName + "'})<-[d:interested]-(e:User) WHERE e.id = '"
                 + userId + "' RETURN d.counter as counter");
-        Record record = result.next();
-        int counter = record.get("counter").asInt();
-        counter += delta;
-        session.run("MATCH (c:Tag {name:'" + tagName + "'})<-[d:interested]-(e:User) WHERE e.id = '"
-                + userId + "' SET d.counter=" + counter);
+
+        if(result.hasNext()){
+
+            Record record = result.next();
+            int counter = record.get("counter").asInt();
+            counter += delta;
+            session.run("MATCH (c:Tag {name:'" + tagName + "'})<-[d:interested]-(e:User) WHERE e.id = '"
+                    + userId + "' SET d.counter=" + counter);
+        }else{
+            StatementResult createResult = session.run("CREATE (u:User {id: '"+userId+"'})-[r:interested {counter : 1}]->(c:Tag {name:'" + tagName + "'}) ");
+
+            System.out.println("asd");
+        }
 
     }
 
