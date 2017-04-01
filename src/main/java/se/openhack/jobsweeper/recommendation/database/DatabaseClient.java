@@ -126,6 +126,13 @@ public class DatabaseClient {
             StatementResult jobs = session.run(query_no_check_for_previous_swipes);
 
             List<JobRecommendation> jobRecommendations = new ArrayList<>();
+
+            String randomRecommendationQuery = "MATCH (a:Job) \n" +
+                    "RETURN a.id as id, rand() as r, ABS(1) as score \n" +
+                    "ORDER BY r\n" +
+                    "limit 2 ";
+            StatementResult randomJobs = session.run(randomRecommendationQuery);
+
             while (jobs.hasNext()) {
                 Record record = jobs.next();
                 int jobId = Integer.parseInt(record.get("id").asString());
@@ -138,6 +145,20 @@ public class DatabaseClient {
                 }
                 jobRecommendations.add(new JobRecommendation(jobId, tags));
             }
+
+            while (randomJobs.hasNext()) {
+                Record record = randomJobs.next();
+                int jobId = Integer.parseInt(record.get("id").asString());
+                StatementResult result = session.run("MATCH (a:Job {id:'" + jobId + "'})-[b:has]->(c:Tag) " +
+                        "return c.name as tag");
+                List<Tag> tags = new ArrayList<>();
+                while (result.hasNext()) {
+                    Record jobTag = result.next();
+                    tags.add(new Tag(jobTag.get("tag").asString()));
+                }
+                jobRecommendations.add(new JobRecommendation(jobId, tags));
+            }
+
             return new JobRecommendationResponse(jobRecommendations);
         }
     }
